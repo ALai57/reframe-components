@@ -1,4 +1,4 @@
-(defproject org.clojars.alai/reframe-components "0.1.0"
+(defproject org.clojars.alai/reframe-components "0.2.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/clojurescript "1.10.520"]
                  [reagent "0.8.1"]
@@ -14,6 +14,9 @@
   :source-paths ["src/clj" "src/cljs"]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+
+  :deploy-repositories [["releases" {:url "https://clojars.org/repo"
+                                     :creds :gpg}]]
 
   :figwheel {:css-dirs ["resources/public/css"]}
 
