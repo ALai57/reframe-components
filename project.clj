@@ -1,4 +1,4 @@
-(defproject org.clojars.alai/reframe-components "0.2.1-SNAPSHOT"
+(defproject org.clojars.alai/reframe-components "0.3.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/clojurescript "1.10.520"]
                  [reagent "0.8.1"]
