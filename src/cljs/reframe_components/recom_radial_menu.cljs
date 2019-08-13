@@ -63,7 +63,7 @@
 (def radial-menu-args-desc
   [{:name :radial-menu-name      :required true  :default "radial-menu-1" :type "string"          :validate-fn string?           :description [:span "the name of the icon." [:br] "For example, " [:code "\"radial-menu-1\""] " or " [:code "\"sports-menu\""]]}
    {:name :menu-radius           :required true  :default "100px"         :type "string"          :validate-fn string?           :description [:span "how far the icons move radially." [:br] "For example, " [:code "\"100px\""] " or " [:code "\"50px\""]]}
-   {:name :background-images     :required false                          :type "vector"          :validate-fn vector?           :description [:span "A list of all background image urls used for icons" [:br] "For example, " [:code "[\"images/home.svg\", \"images/lock.svg\"]"]]}
+   {:name :icons     :required false                          :type "vector"          :validate-fn map?           :description [:span "A map of icons" [:br] "For example, " [:code "[{:home {:url \"images/home.svg\"} :lock {:url \"images/lock.svg\"}]"]]}
    {:name :open?                 :required true                           :type "boolean"         :validate-fn boolean?          :description "is the radial menu open?"}
    {:name :tooltip               :required false                          :type "string | hiccup" :validate-fn string-or-hiccup? :description "what to show in the tooltip"}
    {:name :tooltip-position      :required false :default :below-center   :type "keyword"         :validate-fn position?         :description [:span "relative to this anchor. One of " position-options-list]}
@@ -87,7 +87,7 @@
     (fn
       [& {:keys [radial-menu-name
                  menu-radius center-icon-radius radial-icon-radius
-                 background-images
+                 icons
                  on-center-icon-click on-radial-icon-click
                  open? size
                  tooltip tooltip-position
@@ -104,7 +104,7 @@
 
       ;; Adds keyframes to DOM under <style id="_stylefy-constant-styles_">
       (defonce animations
-        (let [n-images (count background-images)
+        (let [n-images (count icons)
 
               animate-radial-icons
               (fn [animation]
@@ -112,7 +112,7 @@
                         []
                         (map-indexed
                          #(vector (parse-int menu-radius) %1 n-images)
-                         background-images)))]
+                         icons)))]
 
           (animate-radial-icons create-expand-animation)
           (animate-radial-icons create-collapse-animation)))
@@ -122,18 +122,17 @@
             center-icon-position (str "calc(50% - " center-icon-radius "/2)")
             radial-icon-position (str "calc(50% - " radial-icon-radius "/2)")
             create-radial-icon
-            (fn [i icon-url]
+            (fn [i icon]
               ^{:key (str "radial-" i)}
-              [:button (merge {:onClick (on-radial-icon-click
-                                         (str "url(" icon-url ")"))}
-                              (use-style (radial-icon-style-fn i icon-url)))])
+              [:button (merge {:onClick (on-radial-icon-click icon)}
+                              (use-style (radial-icon-style-fn i icon)))])
 
             create-radial-icons
-            (fn [icon-urls]
+            (fn [icons]
               [:div {:style {:position "absolute"
                              :top radial-icon-position
                              :left radial-icon-position}}
-               (doall (map-indexed create-radial-icon icon-urls))])
+               (doall (map-indexed create-radial-icon icons))])
 
             the-menu
             [:div {:style {:position "absolute"}}
@@ -146,7 +145,7 @@
                                         :z-index "4"}}
                [:button#center-icon (merge {:onClick on-center-icon-click}
                                            (use-style (center-icon-style-fn)))]]
-              (create-radial-icons background-images)]]]
+              (create-radial-icons icons)]]]
 
         [box
          :class "rc-md-icon-button-wrapper display-inline-flex"

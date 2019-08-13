@@ -15,14 +15,16 @@
 ;; Setup/init
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (stylefy/init)
-(def icon-list ["images/accessibility.svg"
-                "images/favorite.svg"
-                "images/find-in-page.svg"
-                "images/get-app.svg"
-                "images/grade.svg"
-                "images/home.svg"
-                "images/language.svg"
-                "images/lock.svg"])
+
+(def icons
+  {:accessibility {:image-url "images/accessibility.svg"}
+   :favorite {:image-url "images/favorite.svg"}
+   :find-in-page {:image-url "images/find-in-page.svg"}
+   :get-app {:image-url "images/get-app.svg"}
+   :grade {:image-url "images/grade.svg"}
+   :home {:image-url "images/home.svg"}
+   :language {:image-url "images/language.svg"}
+   :lock {:image-url "images/lock.svg"}})
 
 (def center-icon-radius "75px")
 (def radial-icon-radius "75px")
@@ -41,6 +43,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RENDERING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn path->url [s]
+  (str "url(" s ")"))
 
 (defn expand-or-contract []
   (re-frame/dispatch [:toggle-menu]))
@@ -49,23 +53,23 @@
   (fn [] (re-frame/dispatch [:click-radial-icon icon-url])))
 
 (defn center-icon-style []
-  (let [active-icon (re-frame/subscribe [:active-icon])]
+  (let [active-icon (re-frame/subscribe [:active-icon])
+        [icon-name {:keys [image-url]}] @active-icon]
     (merge base-icon-style
-           {:background-image (str @active-icon
+           {:background-image (str (path->url image-url)
                                    ", "
                                    icon-color-scheme)
             :width center-icon-radius
             :height center-icon-radius})))
 
-(defn make-radial-icon-style [i icon-url]
+(defn make-radial-icon-style [i [icon-name {:keys [image-url]}]]
   (let [radial-menu-open? (re-frame/subscribe [:radial-menu-open?])
         animation (if @radial-menu-open?
                     (str "icon-" i "-open")
                     (str "icon-" i "-collapse"))]
     (merge base-icon-style
            {:background-image
-            (str "url(" icon-url "), "
-                 icon-color-scheme)
+            (str (path->url image-url) ", " icon-color-scheme)
             :width radial-icon-radius
             :height radial-icon-radius
             :box-shadow "0 2px 5px 0 rgba(0, 0, 0, .26)"
@@ -81,7 +85,7 @@
      ((rcm/radial-menu)
       :radial-menu-name "radial-menu-1"
       :menu-radius "100px"
-      :background-images icon-list
+      :icons icons
       :open? @radial-menu-open?
       :tooltip [:div#tooltip {:style {:text-align "left"
                                       :width "100px"}}

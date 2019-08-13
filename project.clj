@@ -18,7 +18,8 @@
   :deploy-repositories [["releases" {:url "https://clojars.org/repo"
                                      :creds :gpg}]]
 
-  :figwheel {:css-dirs ["resources/public/css"]}
+  :figwheel {:css-dirs ["resources/public/css"]
+             :server-port 3450}
 
   :profiles
   {:dev
